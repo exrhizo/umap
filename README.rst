@@ -462,6 +462,72 @@ Nomic Atlas provides:
 * Rich information display on hover
 * Shareable UMAPs via URL links to your embeddings and data maps in Atlas
 
+
+-----------------------------
+Network Visualization with Graphistry
+-----------------------------
+
+PyGraphistry: Open source network science and graph visualization.
+
+.. image:: https://i.imgur.com/8XuQ6IM.jpeg
+   :width: 600
+   :alt: UMAP + Graphistry
+
+Visualize your Metric Space as a Graph
+--------------------------------------
+
+Visually explore the UMAP dimension reduction with Graphistry's similarity edges. 
+Each edge is weighted based on metric distance and the graph layout gives an alternative dimension reduction.
+By loading your data as a network, the relationships can be maniputated and displayed in new ways.
+
+
+Quick start
+---------------------
+
+.. code:: python
+
+    import graphistry, umap, pandas as pd
+    from sklearn.datasets import load_breast_cancer
+
+    # Free login to the Graphistry vis GPU accelerated layout engine
+    graphistry.register(api=3, username='my_user', password='***')
+
+    df = load_breast_cancer(as_frame=True).frame
+
+    g = (
+        graphistry.nodes(df)
+            .umap(n_neighbors=15, min_dist=0.1)
+            .bind(point_color="target")
+    )
+
+    ### raw umap positions
+    g.plot()  # implicitly 'play=0' with passsthrough of umap_learn x, y
+
+    ### aesthetic clustering based on connectivity
+    g2 = g.settings({'strongGravity': True, 'play': 5000})
+    g2.plot()
+
+Learning Resources
+------------------
+
+* **Hello, UMAP** - `simple-power-of-umap.ipynb <demos/ai/Introduction/simple-power-of-umap.ipynb>`_  
+  Intro to UMAP + Graphistry on a few thousand rows.
+
+* **Text & OSINT** - `Ask-HackerNews-Demo.ipynb <demos/ai/Introduction/Ask-HackerNews-Demo.ipynb>`_,  
+  `Chavismo.ipynb <demos/ai/OSINT/Chavismo.ipynb>`_,  
+  `jack-donations.ipynb <demos/ai/OSINT/jack-donations.ipynb>`_  
+  Topic modelling + UMAP + DBSCAN, turned into explorable information-operations maps.
+
+* **Big data / RAPIDS** - `part_iv_gpu_cuml.ipynb <demos/demos_databases_apis/gpu_rapids/part_iv_gpu_cuml.ipynb>`_  
+  Multi-GPU cuML UMAP on >10 M rows, streamed directly to Graphistry.
+
+* **Security at SOC scale** - `advanced-identity-protection-40m.ipynb <demos/talks/infosec_jupyterthon2022/rgcn_login_anomaly_detection/advanced-identity-protection-40m.ipynb>`_  
+  5.6 GB of alerts → 97 % alert-volume reduction pipeline (UMAP-driven correlation, GNN scoring, graph explainability).
+
+* **Relational / SQL / APIs** - `umap_learn.ipynb <demos/demos_databases_apis/umap_learn/umap_learn.ipynb>`_  
+  Connect directly to Postgres, Neptune, Splunk, etc., run GPU UMAP, and visualise joins as graphs.
+
+
 ----------------
 Help and Support
 ----------------
