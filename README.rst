@@ -463,69 +463,59 @@ Nomic Atlas provides:
 * Shareable UMAPs via URL links to your embeddings and data maps in Atlas
 
 
------------------------------
-Network Visualization with Graphistry
------------------------------
 
-PyGraphistry: Open source network science and graph visualization.
-
+Interactive GPU UMAP with Graphistry
 .. image:: https://i.imgur.com/8XuQ6IM.jpeg
-   :width: 600
-   :alt: UMAP + Graphistry
-
-Visualize your Metric Space as a Graph
---------------------------------------
-
-Visually explore the UMAP dimension reduction with Graphistry's similarity edges. 
-Each edge is weighted based on metric distance and the graph layout gives an alternative dimension reduction.
-By loading your data as a network, the relationships can be maniputated and displayed in new ways.
+:width: 600
+:alt: UMAP + Graphistry
 
 
-Quick start
----------------------
+See the structure in your dataframes and embeddings - clusters, outliers, relationships - to go beyond rigid embedding scatterplots. Graphistry uses the k-NN similarity edges in your UMAP to show your full graph, and makes it interactive using browser+server GPUs. The result is you can instantly filter, relayout, and drill into many rows, with every attribute at your fingertips. When done, share live web links.
 
-.. code:: python
+```python
+! pip install -q graphistry
 
-    import graphistry, umap, pandas as pd
-    from sklearn.datasets import load_breast_cancer
+import graphistry, pandas as pd
+from sklearn.datasets import load_breast_cancer
 
-    # Free login to the Graphistry vis GPU accelerated layout engine
-    graphistry.register(api=3, username='my_user', password='***')
+graphistry.register(api=3, username='user', password='***')
+df = load_breast_cancer(as_frame=True).frame
+df['target'] = df['target'].astype('int32')  # reuse for coloring
 
-    df = load_breast_cancer(as_frame=True).frame
+g = (
+    graphistry.nodes(df)
+        # pass in no options, or many!
+        .umap(n_neighbors=15, min_dist=0.1, engine='umap_learn')
+        .encode_point_color('target')
+)
+g.plot()
 
-    g = (
-        graphistry.nodes(df)
-            .umap(n_neighbors=15, min_dist=0.1)
-            .bind(point_color="target")
-    )
+g2 = g.layout_settings(play=2000, strong_gravity=True)
+print('url:', g2.plot(render=False))
+```
 
-    ### raw umap positions
-    g.plot()  # implicitly 'play=0' with passsthrough of umap_learn x, y
+Key advantages:
 
-    ### aesthetic clustering based on connectivity
-    g2 = g.settings({'strongGravity': True, 'play': 5000})
-    g2.plot()
+* Interactive k-NN graph, not just points: See patterns, connectivity, and anomalies clearly
 
-Learning Resources
-------------------
+* Automatic feature engineering: Pass in dataframes with string, date, etc columns and they are automatically encoded before calling UMAP
 
-* **Hello, UMAP** - `simple-power-of-umap.ipynb <demos/ai/Introduction/simple-power-of-umap.ipynb>`_  
-  Intro to UMAP + Graphistry on a few thousand rows.
+* GPU-powered: Fast for projection and visualization, even with millions of relationships, and combine with GPU dataframes
 
-* **Text & OSINT** - `Ask-HackerNews-Demo.ipynb <demos/ai/Introduction/Ask-HackerNews-Demo.ipynb>`_,  
-  `Chavismo.ipynb <demos/ai/OSINT/Chavismo.ipynb>`_,  
-  `jack-donations.ipynb <demos/ai/OSINT/jack-donations.ipynb>`_  
-  Topic modelling + UMAP + DBSCAN, turned into explorable information-operations maps.
+* Drill, filter, color, and relayout live; every data field is accessible
 
-* **Big data / RAPIDS** - `part_iv_gpu_cuml.ipynb <demos/demos_databases_apis/gpu_rapids/part_iv_gpu_cuml.ipynb>`_  
-  Multi-GPU cuML UMAP on >10 M rows, streamed directly to Graphistry.
+* Built-in interactive visual histograms, timebars, entity inspectors, and more
 
-* **Security at SOC scale** - `advanced-identity-protection-40m.ipynb <demos/talks/infosec_jupyterthon2022/rgcn_login_anomaly_detection/advanced-identity-protection-40m.ipynb>`_  
-  5.6 GB of alerts → 97 % alert-volume reduction pipeline (UMAP-driven correlation, GNN scoring, graph explainability).
+* Share interactive visuals
 
-* **Relational / SQL / APIs** - `umap_learn.ipynb <demos/demos_databases_apis/umap_learn/umap_learn.ipynb>`_  
-  Connect directly to Postgres, Neptune, Splunk, etc., run GPU UMAP, and visualise joins as graphs.
+* `GFQL <https://pygraphistry.readthedocs.io/en/latest/gfql/about.html>`_ to query linked embedding clusters
+
+
+Next steps:
+
+* `10 Minutes to PyGraphistry <https://pygraphistry.readthedocs.io/en/latest/10min.html>`_
+* `CPU + GPU UMAP <https://pygraphistry.readthedocs.io/en/latest/demos/demos_databases_apis/gpu_rapids/part_iv_gpu_cuml.html>`_
+* `API for Plottable::umap <https://pygraphistry.readthedocs.io/en/latest/api/ai.html#graphistry.umap_utils.UMAPMixin.umap>`_
 
 
 ----------------
