@@ -462,6 +462,63 @@ Nomic Atlas provides:
 * Rich information display on hover
 * Shareable UMAPs via URL links to your embeddings and data maps in Atlas
 
+
+====================================
+Interactive GPU UMAP with Graphistry
+====================================
+
+.. image:: https://i.imgur.com/8XuQ6IM.jpeg
+   :width: 600
+   :alt: UMAP + Graphistry
+
+See the structure in your dataframes and embeddings - clusters, outliers, relationships - and go beyond rigid embedding scatterplots. Graphistry uses the k-NN similarity edges in your UMAP for an interactive network perspective, in your browser with our GPUs servers. The result is you can instantly filter, relayout, and drill into many rows, with every attribute at your fingertips. After exploring you can share live web links.
+
+.. code:: python
+
+    ! pip install -q graphistry
+
+    import graphistry, pandas as pd
+    from sklearn.datasets import load_breast_cancer
+
+    graphistry.register(api=3, username='user', password='***')
+    df = load_breast_cancer(as_frame=True).frame
+    df['target'] = df['target'].astype('int32')  # reuse for coloring
+
+    g = (
+        graphistry.nodes(df)
+            # pass in no options, or many!
+            .umap(n_neighbors=15, min_dist=0.1, engine='umap_learn')
+            .encode_point_color('target')
+    )
+
+    # See the umap x,y layout with plot() default 'play=0'
+    g.plot()
+
+    # Try another layout, autoplaying for 2 seconds
+    g2 = g.layout_settings(play=2000, strong_gravity=True)
+    print('url:', g2.plot(render=False))
+
+--------------
+Key advantages
+--------------
+
+* **Interactive k-NN graph, not just points** - See patterns, connectivity, and anomalies clearly  
+* **Automatic feature engineering** - Dataframes with string, date, etc columns and they are automatically encoded before calling UMAP
+* **GPU-powered** - Fast for projection and visualization, even with millions of relationships
+* **Drill, filter, color, and relayout live** - every data field is accessible  
+* Built-in interactive histograms, timebars, entity inspectors, and more  
+* Share interactive visuals
+* `GFQL <https://pygraphistry.readthedocs.io/en/latest/gfql/about.html>`_ to query linked embedding clusters
+
+Next steps
+----------
+
+* `10 Minutes to PyGraphistry <https://pygraphistry.readthedocs.io/en/latest/10min.html>`_  
+* `CPU + GPU UMAP demo <https://pygraphistry.readthedocs.io/en/latest/demos/demos_databases_apis/gpu_rapids/part_iv_gpu_cuml.html>`_
+* `API for Graph.umap <https://pygraphistry.readthedocs.io/en/latest/api/ai.html#graphistry.umap_utils.UMAPMixin.umap>`_
+
+----------
+
 ----------------
 Help and Support
 ----------------
